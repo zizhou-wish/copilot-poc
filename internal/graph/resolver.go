@@ -1,8 +1,6 @@
 package graph
 
 import (
-	"copilot-poc/internal/graph/model"
-
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -12,8 +10,8 @@ import (
 //
 // It serves as dependency injection for your app, add any dependencies you require here.
 
-// add MongoDB client as a dependency
+// add user and todo mongoDB collection as dependencies
 type Resolver struct {
-	Client *mongo.Client
-	todos  []*model.Todo
+	TodoColl *mongo.Collection
+	UserColl *mongo.Collection
 }

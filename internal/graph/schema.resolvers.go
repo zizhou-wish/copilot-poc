@@ -7,25 +7,77 @@ package graph
 import (
 	"context"
 	"copilot-poc/internal/graph/model"
-	"fmt"
-	"math/rand"
+	mongoModels "copilot-poc/internal/models"
+
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 // CreateTodo is the resolver for the createTodo field.
 func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) (*model.Todo, error) {
-	todo := &model.Todo{
+	// insert input into MongoDB
+	todo := &mongoModels.Todo{
 		Text:   input.Text,
-		ID:     fmt.Sprintf("T%d", rand.Int()),
-		User:   &model.User{ID: input.UserID, Name: "user " + input.UserID},
 		UserID: input.UserID,
 	}
-	r.todos = append(r.todos, todo)
-	return todo, nil
+
+	doc, err := r.TodoColl.InsertOne(ctx, todo)
+	if err != nil {
+		return nil, err
+	}
+
+	// return the inserted todo
+	return &model.Todo{
+		// use the inserted ID
+		ID:     doc.InsertedID.(primitive.ObjectID).Hex(),
+		Text:   input.Text,
+		Done:   false,
+		UserID: input.UserID,
+	}, nil
+}
+
+// CreateUser is the resolver for the createUser field.
+func (r *mutationResolver) CreateUser(ctx context.Context, input model.NewUser) (*model.User, error) {
+	// insert input into MongoDB
+	user := &mongoModels.User{
+		Name: input.Name,
+	}
+
+	doc, err := r.UserColl.InsertOne(ctx, user)
+	if err != nil {
+		return nil, err
+	}
+
+	// return the inserted user
+	return &model.User{
+		ID:   doc.InsertedID.(primitive.ObjectID).Hex(),
+		Name: input.Name,
+	}, nil
 }
 
 // Todos is the resolver for the todos field.
-func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
-	return r.todos, nil
+func (r *queryResolver) Todos(ctx context.Context, userID string) ([]*model.Todo, error) {
+	// fetch todos from MongoDB
+	todos := []*mongoModels.Todo{}
+	// query mongoDB for todos with userID
+	cur, err := r.TodoColl.Find(ctx, bson.M{"userId": userID})
+	if err != nil {
+		return nil, err
+	}
+	cur.All(ctx, &todos)
+
+	// convert todos to model.Todo
+	modelTodos := []*model.Todo{}
+	for _, todo := range todos {
+		modelTodos = append(modelTodos, &model.Todo{
+			ID:     todo.ID,
+			Text:   todo.Text,
+			UserID: todo.UserID,
+			Done:   todo.Done,
+		})
+	}
+	// return the todos
+	return modelTodos, nil
 }
 
 // User is the resolver for the user field.

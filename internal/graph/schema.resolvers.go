@@ -6,7 +6,7 @@ package graph
 
 import (
 	"context"
-	"copilot-poc/graph/model"
+	"copilot-poc/internal/graph/model"
 	"fmt"
 	"math/rand"
 )

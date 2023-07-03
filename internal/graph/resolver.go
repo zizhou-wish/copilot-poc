@@ -1,6 +1,10 @@
 package graph
 
-import "copilot-poc/graph/model"
+import (
+	"copilot-poc/internal/graph/model"
+
+	"go.mongodb.org/mongo-driver/mongo"
+)
 
 //go:generate go run github.com/99designs/gqlgen generate
 
@@ -8,7 +12,8 @@ import "copilot-poc/graph/model"
 //
 // It serves as dependency injection for your app, add any dependencies you require here.
 
-// add Todo model as dependency
+// add MongoDB client as a dependency
 type Resolver struct {
-	todos []*model.Todo
+	Client *mongo.Client
+	todos  []*model.Todo
 }

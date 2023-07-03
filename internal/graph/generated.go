@@ -5,7 +5,7 @@ package graph
 import (
 	"bytes"
 	"context"
-	"copilot-poc/graph/model"
+	"copilot-poc/internal/graph/model"
 	"embed"
 	"errors"
 	"fmt"

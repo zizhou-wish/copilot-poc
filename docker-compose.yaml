@@ -1,0 +1,24 @@
+version: '3'
+services:
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    volumes:
+      # mount source code in ./cmd and ./intenal
+      - ./cmd:/app/cmd:ro
+      - ./internal:/app/internal:ro
+      - ./config.json:/app/config.json:ro
+    depends_on:
+      - mongo
+  mongo:
+    image: mongo:latest
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=user
+      - MONGO_INITDB_ROOT_PASSWORD=pass
+      - MONGO_INITDB_DATABASE=mydb
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./mongo/init-mongo.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+      - ./mongo/mongo-volume:/data/db

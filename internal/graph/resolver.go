@@ -14,6 +14,7 @@ import (
 
 // add MongoDB client as a dependency
 type Resolver struct {
-	Client *mongo.Client
-	todos  []*model.Todo
+	TodoCollection *mongo.Collection
+	UserCollection *mongo.Collection
+	todos          []*model.Todo
 }

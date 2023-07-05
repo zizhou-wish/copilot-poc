@@ -52,9 +52,15 @@ func main() {
 		}
 	}()
 
+	// Get MongoDB todo collection
+	todoCollection := client.Database(config.MongoDB.DB).Collection("todos")
+	// Get MongoDB user collection
+	userCollection := client.Database(config.MongoDB.DB).Collection("users")
+
 	// Set up GraphQL server
 	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{
-		Client: client,
+		TodoCollection: todoCollection,
+		UserCollection: userCollection,
 	}}))
 
 	// Set up HTTP server

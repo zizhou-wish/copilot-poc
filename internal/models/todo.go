@@ -7,12 +7,21 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
+//go:generate mockery --name TodoRepository --output ./mocks
+
 // Todo is the todo model
 type Todo struct {
 	ID     string `bson:"_id,omitempty"`
 	Text   string `bson:"text"`
 	UserID string `bson:"userId"`
 	Done   bool   `bson:"done"`
+}
+
+// TodoRepository interface
+type TodoRepository interface {
+	// define FindAll and InsertOne
+	FindAll(ctx context.Context, query primitive.M) ([]*Todo, error)
+	InsertOne(ctx context.Context, input *Todo) (insertedID string, err error)
 }
 
 // Define todoRepository struct, should implement TodoRepository interface
@@ -22,7 +31,7 @@ type todoRepository struct {
 }
 
 // Define NewTodoRepository function
-func NewTodoRepository(todoColl *mongo.Collection) *todoRepository {
+func NewTodoRepository(todoColl *mongo.Collection) TodoRepository {
 	return &todoRepository{
 		TodoColl: todoColl,
 	}

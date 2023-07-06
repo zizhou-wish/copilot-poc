@@ -1,6 +1,16 @@
 package models
 
-import "go.mongodb.org/mongo-driver/mongo"
+import (
+	"go.mongodb.org/mongo-driver/mongo"
+)
+
+//go:generate mockery --name UserRepository --output ./mocks
+
+// UserRepository interface
+type UserRepository interface {
+	// define InsertOne
+	InsertOne(input *User) (insertedID string, err error)
+}
 
 // User is the user model
 type User struct {
@@ -15,7 +25,7 @@ type userRepository struct {
 }
 
 // Define NewUserRepository function
-func NewUserRepository(userColl *mongo.Collection) *userRepository {
+func NewUserRepository(userColl *mongo.Collection) UserRepository {
 	return &userRepository{
 		UserColl: userColl,
 	}

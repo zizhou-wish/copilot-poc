@@ -43,7 +43,7 @@ func (r *mutationResolver) CreateUser(ctx context.Context, input model.NewUser) 
 	}
 
 	// insert input into MongoDB using UserRepo
-	userID, err := r.UserRepo.InsertOne(user)
+	userID, err := r.UserRepo.InsertOne(ctx, user)
 	if err != nil {
 		return nil, err
 	}

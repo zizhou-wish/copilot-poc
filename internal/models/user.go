@@ -1,15 +1,17 @@
 package models
 
 import (
+	"context"
+
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-//go:generate mockery --name UserRepository --output ./mocks
+//go:generate mockery --name UserRepository --output ./mocks --filename mock_UserRepository.go
 
 // UserRepository interface
 type UserRepository interface {
 	// define InsertOne
-	InsertOne(input *User) (insertedID string, err error)
+	InsertOne(ctx context.Context, input *User) (insertedID string, err error)
 }
 
 // User is the user model
@@ -32,9 +34,9 @@ func NewUserRepository(userColl *mongo.Collection) UserRepository {
 }
 
 // Define InsertOne method
-func (r *userRepository) InsertOne(input *User) (insertedID string, err error) {
+func (r *userRepository) InsertOne(context context.Context, input *User) (insertedID string, err error) {
 	// insert input into MongoDB
-	doc, err := r.UserColl.InsertOne(nil, input)
+	doc, err := r.UserColl.InsertOne(context, input)
 	if err != nil {
 		return "", err
 	}

@@ -6,16 +6,16 @@ import (
 
 	// import graph/model
 	"copilot-poc/internal/graph/model"
-	"copilot-poc/internal/models"
+	mongoModels "copilot-poc/internal/models"
 	"copilot-poc/internal/models/mocks"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 func TestMutationResolver_CreateTodo(t *testing.T) {
 	// create a new mock Todo repository
-	todoRepo := &mocks.TodoRepository{}
+	todoRepo := mocks.NewTodoRepository(t)
 
 	// create a new resolver
 	resolver := &Resolver{
@@ -25,14 +25,21 @@ func TestMutationResolver_CreateTodo(t *testing.T) {
 	// create a new context
 	ctx := context.Background()
 
-	// create a new input
+	// create graphQL mutation input
 	input := model.NewTodo{
 		Text:   "test todo",
 		UserID: "test user",
 	}
 
-	// set up the mock Todo repository
-	todoRepo.On("InsertOne", mock.Anything, input).Return("insertedID", nil)
+	// create todo repo input
+	repoInput := &mongoModels.Todo{
+		Text:   input.Text,
+		UserID: input.UserID,
+	}
+
+	// todoRepo.On("InsertOne", mock.Anything, repoInput).Return("insertedID", nil)
+	// use mockery mock to return a mock insertedID
+	todoRepo.EXPECT().InsertOne(ctx, repoInput).Return("insertedID", nil)
 
 	// call the resolver function
 	result, err := resolver.Mutation().CreateTodo(ctx, input)
@@ -44,9 +51,6 @@ func TestMutationResolver_CreateTodo(t *testing.T) {
 	assert.Equal(t, input.Text, result.Text)
 	assert.False(t, result.Done)
 	assert.Equal(t, input.UserID, result.UserID)
-
-	// assert that the mock Todo repository was called with the correct arguments
-	todoRepo.AssertCalled(t, "InsertOne", mock.Anything, input)
 }
 
 func TestMutationResolver_CreateUser(t *testing.T) {
@@ -66,8 +70,13 @@ func TestMutationResolver_CreateUser(t *testing.T) {
 		Name: "test user",
 	}
 
-	// set up the mock User repository
-	userRepo.On("InsertOne", mock.Anything, input).Return("insertedID", nil)
+	// create user repo input
+	repoInput := &mongoModels.User{
+		Name: input.Name,
+	}
+
+	// use mockery mock to return a mock insertedID
+	userRepo.EXPECT().InsertOne(ctx, repoInput).Return("insertedID", nil)
 
 	// call the resolver function
 	result, err := resolver.Mutation().CreateUser(ctx, input)
@@ -77,9 +86,6 @@ func TestMutationResolver_CreateUser(t *testing.T) {
 	assert.NotNil(t, result)
 	assert.Equal(t, "insertedID", result.ID)
 	assert.Equal(t, input.Name, result.Name)
-
-	// assert that the mock User repository was called with the correct arguments
-	userRepo.AssertCalled(t, "InsertOne", mock.Anything, input)
 }
 
 func TestQueryResolver_Todos(t *testing.T) {
@@ -98,15 +104,15 @@ func TestQueryResolver_Todos(t *testing.T) {
 	userID := "test user"
 
 	// create a new mock Todo object
-	mockTodo := &models.Todo{
+	mockTodo := &mongoModels.Todo{
 		ID:     "test todo",
 		Text:   "test todo",
 		UserID: userID,
 		Done:   false,
 	}
 
-	// set up the mock Todo repository
-	todoRepo.On("FindAll", mock.Anything, mock.Anything).Return([]*models.Todo{mockTodo}, nil)
+	// use mockery mock to return a mock array of Todos
+	todoRepo.EXPECT().FindAll(ctx, primitive.M{"userId": userID}).Return([]*mongoModels.Todo{mockTodo}, nil)
 
 	// call the resolver function
 	result, err := resolver.Query().Todos(ctx, userID)
@@ -119,7 +125,4 @@ func TestQueryResolver_Todos(t *testing.T) {
 	assert.Equal(t, mockTodo.Text, result[0].Text)
 	assert.Equal(t, mockTodo.UserID, result[0].UserID)
 	assert.Equal(t, mockTodo.Done, result[0].Done)
-
-	// assert that the mock Todo repository was called with the correct arguments
-	todoRepo.AssertCalled(t, "FindAll", mock.Anything, mock.Anything)
 }

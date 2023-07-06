@@ -3,6 +3,7 @@
 package mocks
 
 import (
+	context "context"
 	models "copilot-poc/internal/models"
 
 	mock "github.com/stretchr/testify/mock"
@@ -21,23 +22,23 @@ func (_m *UserRepository) EXPECT() *UserRepository_Expecter {
 	return &UserRepository_Expecter{mock: &_m.Mock}
 }
 
-// InsertOne provides a mock function with given fields: input
-func (_m *UserRepository) InsertOne(input *models.User) (string, error) {
-	ret := _m.Called(input)
+// InsertOne provides a mock function with given fields: ctx, input
+func (_m *UserRepository) InsertOne(ctx context.Context, input *models.User) (string, error) {
+	ret := _m.Called(ctx, input)
 
 	var r0 string
 	var r1 error
-	if rf, ok := ret.Get(0).(func(*models.User) (string, error)); ok {
-		return rf(input)
+	if rf, ok := ret.Get(0).(func(context.Context, *models.User) (string, error)); ok {
+		return rf(ctx, input)
 	}
-	if rf, ok := ret.Get(0).(func(*models.User) string); ok {
-		r0 = rf(input)
+	if rf, ok := ret.Get(0).(func(context.Context, *models.User) string); ok {
+		r0 = rf(ctx, input)
 	} else {
 		r0 = ret.Get(0).(string)
 	}
 
-	if rf, ok := ret.Get(1).(func(*models.User) error); ok {
-		r1 = rf(input)
+	if rf, ok := ret.Get(1).(func(context.Context, *models.User) error); ok {
+		r1 = rf(ctx, input)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -51,14 +52,15 @@ type UserRepository_InsertOne_Call struct {
 }
 
 // InsertOne is a helper method to define mock.On call
+//   - ctx context.Context
 //   - input *models.User
-func (_e *UserRepository_Expecter) InsertOne(input interface{}) *UserRepository_InsertOne_Call {
-	return &UserRepository_InsertOne_Call{Call: _e.mock.On("InsertOne", input)}
+func (_e *UserRepository_Expecter) InsertOne(ctx interface{}, input interface{}) *UserRepository_InsertOne_Call {
+	return &UserRepository_InsertOne_Call{Call: _e.mock.On("InsertOne", ctx, input)}
 }
 
-func (_c *UserRepository_InsertOne_Call) Run(run func(input *models.User)) *UserRepository_InsertOne_Call {
+func (_c *UserRepository_InsertOne_Call) Run(run func(ctx context.Context, input *models.User)) *UserRepository_InsertOne_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(*models.User))
+		run(args[0].(context.Context), args[1].(*models.User))
 	})
 	return _c
 }
@@ -68,7 +70,7 @@ func (_c *UserRepository_InsertOne_Call) Return(insertedID string, err error) *U
 	return _c
 }
 
-func (_c *UserRepository_InsertOne_Call) RunAndReturn(run func(*models.User) (string, error)) *UserRepository_InsertOne_Call {
+func (_c *UserRepository_InsertOne_Call) RunAndReturn(run func(context.Context, *models.User) (string, error)) *UserRepository_InsertOne_Call {
 	_c.Call.Return(run)
 	return _c
 }

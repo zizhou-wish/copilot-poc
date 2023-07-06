@@ -7,7 +7,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-//go:generate mockery --name TodoRepository --output ./mocks
+//go:generate mockery --name TodoRepository --output ./mocks --filename mock_TodoRepository.go
 
 // Todo is the todo model
 type Todo struct {

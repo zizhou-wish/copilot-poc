@@ -16,6 +16,9 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 
 	"copilot-poc/internal/graph"
+
+	// import repository from internal/models
+	"copilot-poc/internal/models"
 )
 
 const defaultPort = "8080"
@@ -57,8 +60,8 @@ func main() {
 
 	// Set up GraphQL server
 	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{
-		TodoColl: todoColl,
-		UserColl: userColl,
+		TodoRepo: models.NewTodoRepository(todoColl),
+		UserRepo: models.NewUserRepository(userColl),
 	}}))
 
 	// Set up HTTP server

@@ -10,14 +10,22 @@ import (
 	mongoModels "copilot-poc/internal/models"
 
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 // CreateTodo is the resolver for the createTodo field.
 func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) (*model.Todo, error) {
+	// cast input.UserID to primitive.ObjectID
+	userID, err := primitive.ObjectIDFromHex(input.UserID)
+	if err != nil {
+		return nil, err
+	}
+
 	// insert input into MongoDB
 	todo := &mongoModels.Todo{
 		Text:   input.Text,
-		UserID: input.UserID,
+		Done:   false,
+		UserID: userID,
 	}
 
 	// insert input into MongoDB using TodoRepo
@@ -59,8 +67,14 @@ func (r *mutationResolver) CreateUser(ctx context.Context, input model.NewUser) 
 func (r *queryResolver) Todos(ctx context.Context, userID string) ([]*model.Todo, error) {
 	// fetch todos from MongoDB
 	todos := []*mongoModels.Todo{}
+
+	// cast userID to primitive.ObjectID
+	userObjectID, err := primitive.ObjectIDFromHex(userID)
+	if err != nil {
+		return nil, err
+	}
 	// get todos from TodoRepo
-	todos, err := r.TodoRepo.FindAll(ctx, bson.M{"userId": userID})
+	todos, err = r.TodoRepo.FindAll(ctx, bson.M{"userId": userObjectID})
 	if err != nil {
 		return nil, err
 	}
@@ -71,7 +85,7 @@ func (r *queryResolver) Todos(ctx context.Context, userID string) ([]*model.Todo
 		modelTodos = append(modelTodos, &model.Todo{
 			ID:     todo.ID,
 			Text:   todo.Text,
-			UserID: todo.UserID,
+			UserID: todo.UserID.Hex(),
 			Done:   todo.Done,
 		})
 	}

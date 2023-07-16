@@ -11,10 +11,10 @@ import (
 
 // Todo is the todo model
 type Todo struct {
-	ID     string `bson:"_id,omitempty"`
-	Text   string `bson:"text"`
-	UserID string `bson:"userId"`
-	Done   bool   `bson:"done"`
+	ID     string             `bson:"_id,omitempty"`
+	Text   string             `bson:"text"`
+	UserID primitive.ObjectID `bson:"userId"`
+	Done   bool               `bson:"done"`
 }
 
 // TodoRepository interface

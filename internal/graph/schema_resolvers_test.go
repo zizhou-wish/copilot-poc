@@ -25,16 +25,18 @@ func TestMutationResolver_CreateTodo(t *testing.T) {
 	// create a new context
 	ctx := context.Background()
 
+	userID := primitive.NewObjectID()
+
 	// create graphQL mutation input
 	input := model.NewTodo{
 		Text:   "test todo",
-		UserID: "test user",
+		UserID: userID.Hex(),
 	}
 
 	// create todo repo input
 	repoInput := &mongoModels.Todo{
 		Text:   input.Text,
-		UserID: input.UserID,
+		UserID: userID,
 	}
 
 	// todoRepo.On("InsertOne", mock.Anything, repoInput).Return("insertedID", nil)
@@ -101,7 +103,7 @@ func TestQueryResolver_Todos(t *testing.T) {
 	ctx := context.Background()
 
 	// create a new user ID
-	userID := "test user"
+	userID := primitive.NewObjectID()
 
 	// create a new mock Todo object
 	mockTodo := &mongoModels.Todo{
@@ -115,7 +117,7 @@ func TestQueryResolver_Todos(t *testing.T) {
 	todoRepo.EXPECT().FindAll(ctx, primitive.M{"userId": userID}).Return([]*mongoModels.Todo{mockTodo}, nil)
 
 	// call the resolver function
-	result, err := resolver.Query().Todos(ctx, userID)
+	result, err := resolver.Query().Todos(ctx, userID.Hex())
 
 	// check the result
 	assert.NoError(t, err)
@@ -123,6 +125,6 @@ func TestQueryResolver_Todos(t *testing.T) {
 	assert.NotEmpty(t, result)
 	assert.Equal(t, mockTodo.ID, result[0].ID)
 	assert.Equal(t, mockTodo.Text, result[0].Text)
-	assert.Equal(t, mockTodo.UserID, result[0].UserID)
+	assert.Equal(t, mockTodo.UserID.Hex(), result[0].UserID)
 	assert.Equal(t, mockTodo.Done, result[0].Done)
 }

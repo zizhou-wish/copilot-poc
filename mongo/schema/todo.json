@@ -1,0 +1,13 @@
+{
+    "title": "todo",
+    "required": [
+       "_id",
+       "userId"
+    ],
+    "properties": {
+      "_id": { "bsonType": "objectId" },
+      "userId": { "bsonType": "objectId" },
+      "text": { "bsonType": "string" },
+      "done": { "bsonType": "boolean" }
+    }
+  }

@@ -1,0 +1,10 @@
+// define JSON schema for user collection
+
+{
+    "title": "user",
+    "required": ["_id", "name"],
+    "properties": {
+        "_id": { "bsonType": "objectId" },
+        "name": { "bsonType": "string" }
+    }
+}

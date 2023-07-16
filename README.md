@@ -14,7 +14,7 @@ go run cmd/main.go
 
 ## Usage
 
-Visite http://localhost:8080
+Visit http://localhost:8080
 
 ### Sample mutation
 
@@ -52,4 +52,10 @@ query todos {
     text
   }
 }
+```
+
+## MongoDB shell
+
+```
+docker exec -it copilot-poc_mongo_1 mongosh "mongodb://user:pass@localhost:27017/mydb"
 ```
